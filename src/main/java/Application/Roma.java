@@ -26,7 +26,7 @@ public class Roma extends Application {
 
     public static void main(String[] args){
         try {
-            romaGrid.readGridFile("Sample Fields/rome3.txt");
+            romaGrid.readGridFile("src/main/resources/roma.txt");
             romaGrid.solve();
         } catch (Exception e) {
             e.printStackTrace();

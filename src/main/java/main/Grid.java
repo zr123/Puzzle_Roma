@@ -3,10 +3,7 @@ package main;
 import exception.ErroneousGridException;
 import exception.MalformedGridException;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -341,7 +338,8 @@ public class Grid {
 
     private List<String> readAllLines(String aFileName) throws FileNotFoundException{
         ArrayList<String> stringList = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(aFileName))) {
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(aFileName), "UTF8"))) {
             String line = br.readLine();
             while(line != null) {
                 stringList.add(line);
@@ -383,7 +381,7 @@ public class Grid {
             case ' ':
                 return new Cell(Arrow.NONE);
         }
-        throw new MalformedGridException();
+        throw new MalformedGridException("Unexpected character in grid: " + aCharacter);
     }
 
     public int getGridWidth(){
