@@ -31,9 +31,7 @@ public class Cell {
     public Cell(Cell cell) {
         arrow = cell.arrow;
         immutable = cell.immutable;
-        for (Arrow option : cell.options) {
-            options.add(option);
-        }
+        options.addAll(cell.options);
     }
 
     public Set<Arrow> getOptions(){
@@ -62,17 +60,5 @@ public class Cell {
         options.remove(arrow);
         this.arrow = arrow;
         getRegion().removeOption(arrow);
-    }
-
-    public void resetArrow(){
-        if(!immutable && arrow != Arrow.NONE && arrow != Arrow.CIRCLE){
-            getRegion().addOption(arrow);
-            arrow = Arrow.NONE;
-            // TODO reset options
-        }
-    }
-
-    public void makeImmutable() {
-        this.immutable = true;
     }
 }

@@ -10,14 +10,18 @@ import java.util.Set;
 
 public class Grid {
     private List<String> file;
+    private final int MAX_DEPTH = 5;
     private int gridWidth = 0;
     private int gridHeight = 0;
 
-    private ArrayList<Region> regions = new ArrayList<>();
-    //     cell[y][x]
-    private Cell[][] cells;
+    private List<Region> regions = new ArrayList<>();
+    private Cell[][] cells; // cell[y][x]
 
     public Grid(){}
+
+    public Grid(String aFileName) throws IOException, MalformedGridException {
+        this.readGridFile(aFileName);
+    }
 
     public Grid(Grid grid){
         gridHeight = grid.getGridHeight();
@@ -41,34 +45,52 @@ public class Grid {
     public void solve() throws ErroneousGridException {
         updatePossibilitiesOfAllCells();
         int recursionDepth = 0;
-        while(!isComplete())// && recursionDepth < 4)
+        while(!isComplete() && recursionDepth <= MAX_DEPTH)
             trailAndError(recursionDepth++);
+    }
+
+    private void updatePossibilitiesOfAllCells(){
+        removeOutwardPointingOptionFromGridEdges();
+        removeOpposingPointingOptions();
+        removeUsedArrowDirections();
     }
 
     private void trailAndError(int recursionLevel) throws ErroneousGridException {
         if(recursionLevel == 0)
-            while(checkAndAdjustAllCells());
+            lockCellsWithOnlyOneOptionIn();
         else
             for(int y = 0; y < gridHeight; ++y)
                 for(int x = 0; x < gridWidth; ++x) {
                     if (cells[y][x].getArrow().equals(Arrow.NONE)) {
                         tryTrailAndErrorOnCell(y, x, recursionLevel);
-                        while (checkAndAdjustAllCells()) ;
+                        lockCellsWithOnlyOneOptionIn();
                     }
                 }
     }
 
-    private void tryTrailAndErrorOnCell(int y, int x, int aRecursionLevel){
-        Arrow[] remainingOptions = cells[y][x].getOptions().toArray(new Arrow[cells[y][x].getOptions().size()]);
-        for (Arrow arrow : remainingOptions) {
+    /**
+     * Locks all cells in which have only one option left.
+     */
+    private void lockCellsWithOnlyOneOptionIn() throws ErroneousGridException {
+        for(int y = 0; y < gridHeight; ++y)
+            for(int x = 0; x < gridWidth; ++x)
+                if(checkCellOptions(y, x)){
+                    // set Cell and start over.
+                    setCellAndUpdateOptions(y, x, getLastRemainingOption(cells[y][x].getOptions()));
+                    y = 0;
+                    x = 0;
+                }
+    }
 
+    private void tryTrailAndErrorOnCell(int y, int x, int aRecursionLevel){
+        for (Arrow arrow : cells[y][x].getOptions().toArray(new Arrow[cells[y][x].getOptions().size()])) {
             Grid trailGrid = new Grid(this);
-            trailGrid.setCell(y, x, arrow);
+            trailGrid.setCellAndUpdateOptions(y, x, arrow);
             try{
                 trailGrid.trailAndError(aRecursionLevel - 1);
                 trailGrid.checkCircularPaths(y, x, gridHeight*gridWidth);
                 if(trailGrid.isComplete()) {
-                    setCell(y, x, arrow);
+                    setCellAndUpdateOptions(y, x, arrow);
                     return;
                 }
             }catch (ErroneousGridException e){
@@ -94,59 +116,22 @@ public class Grid {
         }
 
     /**
-     *
-     */
-    public void updatePossibilitiesOfAllCells(){
-        removeOutwardPointingOptionFromGridEdges();
-        removeOpposingPointingOptions();
-        removeUsedArrowDirections();
-    }
-
-    public boolean checkAndAdjustAllCells() throws ErroneousGridException {
-        boolean cellChanged = false;
-
-        // check and adjust cells
-        for(int y = 0; y < gridHeight; ++y)
-            for(int x = 0; x < gridWidth; ++x)
-                if(checkAndAdjustCell(y, x))
-                    cellChanged = true;
-
-        // check and adjust regions
-        /*
-        for (main.Region region : regions) {
-            main.Cell singleOptionCell = region.sumRemainingOptions();
-            if(singleOptionCell != null){
-                for(int y = 0; y < gridHeight; ++y)
-                    for(int x = 0; x < gridWidth; ++x)
-                        if(cells[y][x] == singleOptionCell)
-                            System.out.println("cell y" + y + " x" + x + " has only one option remaining");
-            }
-        }
-        */
-        return cellChanged;
-    }
-
-    /**
-     * If Only one Option is remaining. This function locks that Option in.
-     * This function then adjusts the options of other cells affected by this change.
+     * This function checks if a cell is unsolved and has only one option remainging.
      * @param y y-Coordinate of the cell.
      * @param x x-Coordinate of the cell.
-     * @return True if an option has been successfully locked in. Otherwise false.
+     * @return True of the Cell has only one Option remaining. Otherwise false.
+     * @throws ErroneousGridException If there are no options left the current grid is erroneous.
      */
-    private boolean checkAndAdjustCell(int y, int x) throws ErroneousGridException {
-        if (cells[y][x].getArrow().equals(Arrow.NONE)) {
-            Set<Arrow> remainingOptions = cells[y][x].getOptions();
-            if (remainingOptions.size() == 0)
-                throw new ErroneousGridException("main.Cell y:" + y + " x:" + x + " left without any Options");
-            if (remainingOptions.size() == 1) {
-                setCell(y, x, getLastRemainingOption(remainingOptions));
-                return true;
+    private boolean checkCellOptions(int y, int x) throws ErroneousGridException {
+        if (cells[y][x].getArrow().equals(Arrow.NONE))
+            switch (cells[y][x].getOptions().size()){
+                case 0: throw new ErroneousGridException("Cell y:" + y + " x:" + x + " has no options remaining");
+                case 1: return true;
             }
-        }
         return false;
     }
 
-    private void setCell(int y, int x, Arrow aArrow){
+    private void setCellAndUpdateOptions(int y, int x, Arrow aArrow){
         cells[y][x].setArrow(aArrow);
         cells[y][x].getRegion().removeUsedOptionsFromCells();
         removeOpposingPointingOptionFromAdjacentCell(y, x);
@@ -200,10 +185,15 @@ public class Grid {
         }
     }
 
+    /**
+     * The coordinates of a cell may not be negative or greater than the field size.
+     * This function verifies this.
+     * @param y y-coordinate to be checked
+     * @param x x-coordinate to be checked
+     * @return True if the coordinate is valid. Otherwise false.
+     */
     private boolean checkBounds(int y, int x){
-        if(y < 0 || y >= gridHeight || x < 0 || x >= gridWidth)
-            return false;
-        return true;
+        return y >= 0 && y < gridHeight && x >= 0 && x < gridWidth;
     }
 
     /**
@@ -216,6 +206,10 @@ public class Grid {
         }
     }
 
+    /**
+     * Checks if the grid is correctly filled and the destination cell is reached from every cell.
+     * @return True if the grid is complete. Otherwise false.
+     */
     public boolean isComplete(){
         return allCellsFilled() && allRegionsValid() && allCellsReachTheDestination();
     }
@@ -257,7 +251,7 @@ public class Grid {
         throw new UnsupportedOperationException("Unexpected cell state: " + cells[y][x].getArrow());
     }
 
-    public void readGridFile(String aFileName) throws FileNotFoundException, MalformedGridException {
+    public void readGridFile(String aFileName) throws IOException, MalformedGridException {
         file = readAllLines(aFileName);
         this.gridWidth = calculateGridWidth(file);
         this.gridHeight = calculateGridHeight(file);
@@ -336,17 +330,14 @@ public class Grid {
         return (lines.size()-1)/2;
     }
 
-    private List<String> readAllLines(String aFileName) throws FileNotFoundException{
+    private List<String> readAllLines(String aFileName) throws IOException {
         ArrayList<String> stringList = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(aFileName), "UTF8"))) {
-            String line = br.readLine();
-            while(line != null) {
-                stringList.add(line);
-                line = br.readLine();
-            }
-        }catch (IOException e){
-            e.printStackTrace();
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(aFileName), "UTF8"));
+        String line = br.readLine();
+        while(line != null) {
+            stringList.add(line);
+            line = br.readLine();
         }
         return stringList;
     }
@@ -392,7 +383,7 @@ public class Grid {
         return this.gridHeight;
     }
 
-    public ArrayList<Region> getRegions(){
+    public List<Region> getRegions(){
         return this.regions;
     }
 
@@ -403,18 +394,4 @@ public class Grid {
     public List<String> getFile(){
         return this.file;
     }
-
-    /*
-    @Override
-    public boolean equals(Object o){
-        if(!o.getClass().equals(main.Grid.class))
-            return false;
-        main.Grid compareGrid = (main.Grid)o;
-        if(gridWidth != compareGrid.gridWidth || gridHeight != compareGrid.gridHeight || !Arrays.deepEquals(cells, compareGrid.cells))
-            return false;
-        if(!regions.equals(compareGrid.regions))
-            return false;
-        return true;
-    }
-    */
 }

@@ -1,7 +1,5 @@
 package Application;
 
-import exception.ErroneousGridException;
-import exception.MalformedGridException;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,13 +10,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import main.Grid;
 
-import java.io.FileNotFoundException;
 import java.util.List;
-
-// https://stackoverflow.com/questions/34218434/sudoku-gui-grid-lines#34225599
-// https://www.janko.at/Raetsel/Nikoli/index-2.htm
-// http://indi.s58.xrea.com/roma/
-// http://www.cross-plus-a.com/de/puzzles.htm#Roma
 
 public class Roma extends Application {
 
@@ -37,34 +29,36 @@ public class Roma extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        GridPane board = createGridDisplac(romaGrid);
+        Scene scene = new Scene(board);
+        primaryStage.setTitle("Application.Roma");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
 
+    public GridPane createGridDisplac(Grid grid){
         GridPane board = new GridPane();
         board.setStyle("-fx-padding: 5px;");
 
-        for (int col = 0; col < romaGrid.getGridHeight(); col++) {
-            for (int row = 0; row < romaGrid.getGridWidth(); row++) {
+        for (int col = 0; col < grid.getGridHeight(); col++) {
+            for (int row = 0; row < grid.getGridWidth(); row++) {
                 StackPane cell = new StackPane();
 
-                String borders = calculateBorderString(romaGrid.getFile(), col, row);
+                String borders = calculateBorderString(grid.getFile(), col, row);
 
                 cell.setStyle(
-                        "-fx-background-color:      black, -fx-base ;" +
-                        "-fx-padding:               3px;" +
-                        "-fx-background-insets:     0, " + borders + ";");
+                        "-fx-background-color:              black, -fx-base ;" +
+                                "-fx-padding:               3px;" +
+                                "-fx-background-insets:     0px, " + borders + ";");
 
 
-                String arrow = romaGrid.getCell(row, col).getArrow().toChar();
+                String arrow = grid.getCell(row, col).getArrow().toChar();
                 cell.getChildren().add(createTextField(arrow));
 
                 board.add(cell, col, row);
             }
         }
-
-
-        Scene scene = new Scene(board);
-        primaryStage.setTitle("Application.Roma");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        return board;
     }
 
     private TextField createTextField(String text) {

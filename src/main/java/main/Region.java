@@ -16,9 +16,7 @@ public class Region {
     }
 
     public Region(Region region){
-        for (Arrow option : region.options) {
-            options.add(option);
-        }
+        options.addAll(region.options);
     }
 
     public void addCell(Cell cell) {
@@ -31,6 +29,10 @@ public class Region {
         return this.cells;
     }
 
+    /**
+     * Verify that the region doesn't contain an arrow-direction twice.
+     * @return True if the region is correct. Otherwise false.
+     */
     public boolean checkCorrectness(){
         Cell[] tmpCells = cells.toArray(new Cell[cells.size()]);
         for(int i = 0; i < tmpCells.length; ++i)
@@ -40,12 +42,12 @@ public class Region {
         return true;
     }
 
-    public void addOption(Arrow arrow){
-        options.add(arrow);
-    }
-
     public void removeOption(Arrow arrow) {
         options.remove(arrow);
+    }
+
+    public Set<Arrow> getOptions(){
+        return options;
     }
 
     public void removeUsedOptionsFromCells() {
@@ -55,31 +57,5 @@ public class Region {
             if(!options.contains(Arrow.LEFT))cell.removeOption(Arrow.LEFT);
             if(!options.contains(Arrow.RIGHT))cell.removeOption(Arrow.RIGHT);
         }
-    }
-
-    public Cell sumRemainingOptions(){
-        if(cells.size() != 4)
-            return null;
-        int up = 0, down = 0, left = 0, right = 0;
-        for (Cell cell : cells)
-            for (Arrow arrow : cell.getOptions())
-                switch (arrow){
-                    case UP:    up++; break;
-                    case DOWN:  down++; break;
-                    case LEFT:  left++; break;
-                    case RIGHT: right++; break;
-                }
-        if(up == 1) return findSingleOptionCell(Arrow.UP);
-        if(down == 1) return findSingleOptionCell(Arrow.DOWN);
-        if(left == 1) return findSingleOptionCell(Arrow.LEFT);
-        if(right == 1) return findSingleOptionCell(Arrow.RIGHT);
-        return null;
-    }
-
-    private Cell findSingleOptionCell(Arrow direction){
-        for (Cell cell : cells)
-            if(cell.getOptions().contains(direction))
-                return cell;
-        return null;
     }
 }

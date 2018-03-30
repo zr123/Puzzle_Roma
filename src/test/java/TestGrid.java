@@ -4,7 +4,7 @@ import main.Arrow;
 import main.Grid;
 import org.junit.Test;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -14,16 +14,15 @@ public class TestGrid extends Grid{
     private final String filePath = "src/test/resources/";
 
     @Test
-    public void testReadGridFile_Rome1() throws FileNotFoundException, MalformedGridException {
-        Grid testGrid = new Grid();
-        testGrid.readGridFile(filePath + "rome1.txt");
+    public void testReadGridFile_Rome1() throws IOException, MalformedGridException {
+        Grid testGrid = new  Grid(filePath + "rome1.txt");
         assertEquals(4, testGrid.getGridWidth());
         assertEquals(4, testGrid.getGridHeight());
         assertEquals(6, testGrid.getRegions().size());
     }
 
     @Test
-    public void testReadGridFile_Rome1Solved() throws FileNotFoundException, MalformedGridException {
+    public void testReadGridFile_Rome1Solved() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1_solved.txt");
         assertEquals(4, testGrid.getGridWidth());
@@ -32,7 +31,7 @@ public class TestGrid extends Grid{
     }
 
     @Test
-    public void testReadGridFile_Rome2() throws FileNotFoundException, MalformedGridException {
+    public void testReadGridFile_Rome2() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome2.txt");
         assertEquals(8, testGrid.getGridWidth());
@@ -41,7 +40,7 @@ public class TestGrid extends Grid{
     }
 
     @Test
-    public void testReadGridFile_Rome3() throws FileNotFoundException, MalformedGridException {
+    public void testReadGridFile_Rome3() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome3.txt");
         assertEquals(8, testGrid.getGridWidth());
@@ -50,7 +49,7 @@ public class TestGrid extends Grid{
     }
 
     @Test
-    public void testCopyConstructor() throws FileNotFoundException, MalformedGridException {
+    public void testCopyConstructor() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome3.txt");
         Grid copiedGrid = new Grid(testGrid);
@@ -61,7 +60,7 @@ public class TestGrid extends Grid{
     }
 
     @Test
-    public void testRemoveOutwardPointingOptionFromGridEdges() throws FileNotFoundException, MalformedGridException {
+    public void testRemoveOutwardPointingOptionFromGridEdges() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1.txt");
         testGrid.removeOutwardPointingOptionFromGridEdges();
@@ -78,7 +77,7 @@ public class TestGrid extends Grid{
     }
 
     @Test
-    public void testRemoveOpposingPointingOptions() throws FileNotFoundException, MalformedGridException {
+    public void testRemoveOpposingPointingOptions() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1.txt");
         testGrid.removeOpposingPointingOptions();
@@ -95,7 +94,7 @@ public class TestGrid extends Grid{
     }
 
     @Test
-    public void testRemoveUsedArrowDirections() throws FileNotFoundException, MalformedGridException {
+    public void testRemoveUsedArrowDirections() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1.txt");
         testGrid.removeUsedArrowDirections();
@@ -123,96 +122,84 @@ public class TestGrid extends Grid{
     }
 
     @Test
-    public void testCheckAndAdjustAllCells() throws FileNotFoundException, MalformedGridException, ErroneousGridException {
-        Grid testGrid = new Grid();
-        testGrid.readGridFile(filePath + "rome1.txt");
-        testGrid.updatePossibilitiesOfAllCells();
-        testGrid.checkAndAdjustAllCells();
-        assertEquals(Arrow.RIGHT, testGrid.getCell(0, 0).getArrow());
-        assertEquals(Arrow.LEFT, testGrid.getCell(0, 3).getArrow());
-        assertEquals(Arrow.UP, testGrid.getCell(3, 0).getArrow());
-        assertEquals(Arrow.UP, testGrid.getCell(3, 3).getArrow());
-    }
-
-    @Test
-    public void testAllCellsFilled_True() throws FileNotFoundException, MalformedGridException {
+    public void testAllCellsFilled_True() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1_solved.txt");
         assertTrue(testGrid.allCellsFilled());
     }
 
     @Test
-    public void testAllCellsFilled_False() throws FileNotFoundException, MalformedGridException {
+    public void testAllCellsFilled_False() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1.txt");
         assertFalse(testGrid.allCellsFilled());
     }
 
     @Test
-    public void testAllRegionsValid_True() throws FileNotFoundException, MalformedGridException {
+    public void testAllRegionsValid_True() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1_solved.txt");
         assertTrue(testGrid.allRegionsValid());
     }
 
     @Test
-    public void testAllRegionsValid_False() throws FileNotFoundException, MalformedGridException {
+    public void testAllRegionsValid_False() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1_error.txt");
         assertFalse(testGrid.allRegionsValid());
     }
 
     @Test
-    public void testAllCellsReachTheDestination_True() throws FileNotFoundException, MalformedGridException {
+    public void testAllCellsReachTheDestination_True() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1_solved.txt");
         assertTrue(testGrid.allCellsReachTheDestination());
     }
 
     @Test
-    public void testAllCellsReachTheDestination_FalsePositive() throws FileNotFoundException, MalformedGridException {
+    public void testAllCellsReachTheDestination_FalsePositive() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1_error.txt");
         assertTrue(testGrid.allCellsReachTheDestination());
     }
 
     @Test
-    public void testAllCellsReachTheDestination_CircularFalse() throws FileNotFoundException, MalformedGridException {
+    public void testAllCellsReachTheDestination_CircularFalse() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1_circular.txt");
         assertFalse(testGrid.allCellsReachTheDestination());
     }
 
     @Test
-    public void testAllCellsReachTheDestination_False() throws FileNotFoundException, MalformedGridException {
+    public void testAllCellsReachTheDestination_False() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1.txt");
         assertFalse(testGrid.allCellsReachTheDestination());
     }
 
     @Test
-    public void testIsComplete_True() throws FileNotFoundException, MalformedGridException {
+    public void testIsComplete_True() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1_solved.txt");
         assertTrue(testGrid.isComplete());
     }
 
     @Test
-    public void testIsComplete_False1() throws FileNotFoundException, MalformedGridException {
+    public void testIsComplete_False1() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1.txt");
         assertFalse(testGrid.isComplete());
     }
 
     @Test
-    public void testIsComplete_False2() throws FileNotFoundException, MalformedGridException {
+    public void testIsComplete_False2() throws IOException, MalformedGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1_error.txt");
         assertFalse(testGrid.isComplete());
     }
 
     @Test
-    public void testSolve_Rome1() throws FileNotFoundException, MalformedGridException, ErroneousGridException {
+    public void testSolve_Rome1() throws IOException, MalformedGridException, ErroneousGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome1.txt");
         testGrid.solve();
@@ -220,7 +207,7 @@ public class TestGrid extends Grid{
     }
 
     @Test
-    public void testSolve_Rome2() throws FileNotFoundException, MalformedGridException, ErroneousGridException {
+    public void testSolve_Rome2() throws IOException, MalformedGridException, ErroneousGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome2.txt");
         testGrid.solve();
@@ -228,7 +215,7 @@ public class TestGrid extends Grid{
     }
 
     @Test
-    public void testSolve_Rome3() throws FileNotFoundException, MalformedGridException, ErroneousGridException {
+    public void testSolve_Rome3() throws IOException, MalformedGridException, ErroneousGridException {
         Grid testGrid = new Grid();
         testGrid.readGridFile(filePath + "rome3.txt");
         testGrid.solve();
