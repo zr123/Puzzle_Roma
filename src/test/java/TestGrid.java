@@ -221,4 +221,12 @@ public class TestGrid extends Grid{
         testGrid.solve();
         assertTrue(testGrid.isComplete());
     }
+
+    @Test
+    public void testSolve_Roma() throws IOException, MalformedGridException, ErroneousGridException {
+        Grid testGrid = new Grid();
+        testGrid.readGridFile(filePath + "roma.txt");
+        testGrid.solve();
+        assertTrue(testGrid.isComplete());
+    }
 }
