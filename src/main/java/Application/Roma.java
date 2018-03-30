@@ -11,14 +11,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import main.Grid;
 
-import java.awt.peer.ButtonPeer;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -28,7 +26,7 @@ public class Roma extends Application {
     private static Grid romaGrid;
     private static GridPane romaGridPane = new GridPane();
 
-    public static void main(String[] args) throws IOException, MalformedGridException {
+    public static void main(String[] args) {
         launch(args);
     }
 
@@ -46,7 +44,7 @@ public class Roma extends Application {
         primaryStage.show();
     }
 
-    public GridPane createButtonGridPane(Stage primaryStage){
+    private GridPane createButtonGridPane(Stage primaryStage){
         GridPane buttonPane = new GridPane();
         buttonPane.setHgap(10);
         buttonPane.setVgap(10);
@@ -56,7 +54,7 @@ public class Roma extends Application {
         return buttonPane;
     }
 
-    public Button createFileChooserButton(Stage stage){
+    private Button createFileChooserButton(Stage stage){
         final Button fileButton = new Button("Load a Roma File ...");
         fileButton.setOnAction(
                 new EventHandler<ActionEvent>() {
@@ -77,7 +75,7 @@ public class Roma extends Application {
         return fileButton;
     }
 
-    public Button createRomaSolveButton(){
+    private Button createRomaSolveButton(){
         final Button solveButton = new Button("Solve");
         solveButton.setOnAction(
                 new EventHandler<ActionEvent>() {
@@ -96,7 +94,7 @@ public class Roma extends Application {
         return solveButton;
     }
 
-    public FileChooser getRomaFileChooser(){
+    private FileChooser getRomaFileChooser(){
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Roma Files", "*.roma"));
@@ -104,7 +102,7 @@ public class Roma extends Application {
         return fileChooser;
     }
 
-    public void reloadRomaGridDisplay(){
+    private void reloadRomaGridDisplay(){
         romaGridPane.getChildren().clear();
         romaGridPane.setStyle("-fx-padding: 5px;");
 
