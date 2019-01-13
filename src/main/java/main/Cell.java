@@ -13,7 +13,7 @@ public class Cell {
     public Cell(Arrow aArrow){
         arrow = aArrow;
         if (aArrow.equals(Arrow.NONE)){
-            options = Arrow.getDetaultOptions();
+            options = Arrow.getDefaultOptions();
         }
         this.immutable = false;
     }

@@ -18,7 +18,7 @@ public enum Arrow{
         return "";
     }
 
-    public static Set<Arrow> getDetaultOptions(){
+    public static Set<Arrow> getDefaultOptions(){
         Set<Arrow> options = new HashSet<>();
         options.add(Arrow.UP);
         options.add(Arrow.DOWN);

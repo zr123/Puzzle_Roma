@@ -9,7 +9,7 @@ public class Region {
     private Set<Arrow> options = new HashSet<>();
 
     public Region() {
-        options = Arrow.getDetaultOptions();
+        options = Arrow.getDefaultOptions();
     }
 
     public Region(Region region){
