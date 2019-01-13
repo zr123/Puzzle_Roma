@@ -31,11 +31,13 @@ public class Region {
      * @return True if the region is correct. Otherwise false.
      */
     public boolean checkCorrectness(){
-        Cell[] tmpCells = cells.toArray(new Cell[cells.size()]);
-        for(int i = 0; i < tmpCells.length; ++i)
-            for (int k = i +1; k < tmpCells.length; ++k)
-                if (tmpCells[i].getArrow().equals(tmpCells[k].getArrow()))
-                    return false;
+        Set<Arrow> checkedOptions = new HashSet<>();
+        for (Cell cell : cells){
+            if(checkedOptions.contains(cell.getArrow())){
+                return false;
+            }
+            checkedOptions.add(cell.getArrow());
+        }
         return true;
     }
 
@@ -48,11 +50,9 @@ public class Region {
     }
 
     public void removeUsedOptionsFromCells() {
-        for (Cell cell : cells) {
-            if(!options.contains(Arrow.UP))cell.removeOption(Arrow.UP);
-            if(!options.contains(Arrow.DOWN))cell.removeOption(Arrow.DOWN);
-            if(!options.contains(Arrow.LEFT))cell.removeOption(Arrow.LEFT);
-            if(!options.contains(Arrow.RIGHT))cell.removeOption(Arrow.RIGHT);
-        }
+        for (Cell cell : cells)
+            for(Arrow arrow : Arrow.getDefaultOptions())
+                if(!options.contains(arrow))
+                    cell.removeOption(arrow);
     }
 }
