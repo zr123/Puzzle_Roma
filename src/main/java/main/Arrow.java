@@ -1,5 +1,8 @@
 package main;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public enum Arrow{
     NONE, UP, DOWN, LEFT, RIGHT, CIRCLE;
 
@@ -13,5 +16,14 @@ public enum Arrow{
             case CIRCLE:    return "O";
         }
         return "";
+    }
+
+    public static Set<Arrow> getDetaultOptions(){
+        Set<Arrow> options = new HashSet<>();
+        options.add(Arrow.UP);
+        options.add(Arrow.DOWN);
+        options.add(Arrow.LEFT);
+        options.add(Arrow.RIGHT);
+        return options;
     }
 }
