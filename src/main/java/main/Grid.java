@@ -20,6 +20,7 @@ public class Grid {
     public Grid(int width, int height){
         this.gridWidth = width;
         this.gridHeight = height;
+        cells = new Cell[this.gridHeight][this.gridWidth];
     }
 
     public Grid(Grid grid){
@@ -27,9 +28,8 @@ public class Grid {
         gridWidth = grid.getGridWidth();
         for (Region region : grid.getRegions())
             regions.add(new Region(region));
-        initCells();
+        cells = new Cell[this.gridHeight][this.gridWidth];
         deepCopyCells(grid);
-
     }
 
     private void deepCopyCells(Grid grid){
@@ -76,10 +76,8 @@ public class Grid {
         for(int y = 0; y < gridHeight; ++y)
             for(int x = 0; x < gridWidth; ++x)
                 if(cells[y][x].checkCellOptions()){
-                    // set Cell and start over.
                     setCellAndUpdateOptions(y, x, getLastRemainingOption(cells[y][x].getOptions()));
-                    y = 0;
-                    x = 0;
+                    y = x = 0;
                 }
     }
 
@@ -234,10 +232,6 @@ public class Grid {
             case CIRCLE:    return true;
         }
         throw new UnsupportedOperationException("Unexpected cell state: " + cells[y][x].getArrow());
-    }
-
-    public void initCells() {
-        cells = new Cell[this.gridHeight][this.gridWidth];
     }
 
     public int getGridWidth(){

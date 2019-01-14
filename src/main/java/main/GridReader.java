@@ -15,7 +15,6 @@ public class GridReader {
         List<String> file = readAllLines(aFileName);
         Grid grid = new Grid(calculateGridWidth(file), calculateGridHeight(file));
         grid.file = file;
-        grid.initCells();
         parseAllFields(grid, file);
         calculateRegions(grid, file);
         return grid;
@@ -54,13 +53,15 @@ public class GridReader {
     private static void connectCellsHorizontally(Grid grid, List<String> lines) {
         for(int y = 0; y < grid.getGridHeight(); ++y)
             for (int x = 0; x < grid.getGridWidth() - 1; ++x)
-                connectRegions(grid, grid.getCell(y, x), grid.getCell(y, x + 1), lines.get(y * 2 + 1).charAt((x + 1) * 2));
+                if(lines.get(y * 2 + 1).charAt((x + 1) * 2) == ' ')
+                    connectRegions(grid, grid.getCell(y, x), grid.getCell(y, x + 1));
     }
 
     private static void connectCellsVertically(Grid grid, List<String> lines) {
         for(int x = 0; x < grid.getGridWidth(); ++x)
             for (int y = 0; y < grid.getGridHeight() - 1; ++y)
-                connectRegions(grid, grid.getCell(y, x), grid.getCell(y + 1, x), lines.get((y + 1) * 2).charAt(x * 2 + 1));
+                if(lines.get((y + 1) * 2).charAt(x * 2 + 1) == ' ')
+                    connectRegions(grid, grid.getCell(y, x), grid.getCell(y + 1, x));
     }
 
     private static void createSingleCellRegions(Grid grid) {
@@ -73,22 +74,15 @@ public class GridReader {
                 }
     }
 
-    private static void connectRegions(Grid grid, Cell cellA, Cell cellB, char c) {
-        if(c == ' '){
-            if(cellA.getRegion() == null && cellB.getRegion() == null){
-                Region newRegion = new Region();
-                newRegion.addCell(cellA);
-                newRegion.addCell(cellB);
-                grid.getRegions().add(newRegion);
-            }else{
-                if(cellA.getRegion() == null)
-                    cellB.getRegion().addCell(cellA);
-                if(cellB.getRegion() == null)
-                    cellA.getRegion().addCell(cellB);
-            }
-            if(cellA.getRegion() != null && cellB.getRegion() != null)
-                fuseRegions(grid, cellA.getRegion(), cellB.getRegion());
-        }
+    private static void connectRegions(Grid grid, Cell cellA, Cell cellB) {
+        if(cellA.getRegion() != null && cellB.getRegion() != null)
+            fuseRegions(grid, cellA.getRegion(), cellB.getRegion());
+        if(cellA.getRegion() == null && cellB.getRegion() == null)
+            createRegion(grid, cellA, cellB);
+        if(cellA.getRegion() == null)
+            cellB.getRegion().addCell(cellA);
+        if(cellB.getRegion() == null)
+            cellA.getRegion().addCell(cellB);
     }
 
     private static void fuseRegions(Grid grid, Region regionA, Region regionB) {
@@ -98,6 +92,13 @@ public class GridReader {
             regionB.getCells().clear();
             grid.getRegions().remove(regionB);
         }
+    }
+
+    private static void createRegion(Grid grid, Cell cellA, Cell cellB) {
+        Region newRegion = new Region();
+        newRegion.addCell(cellA);
+        newRegion.addCell(cellB);
+        grid.getRegions().add(newRegion);
     }
 
     private static void parseAllFields(Grid grid, List<String> lines) throws MalformedGridException {
