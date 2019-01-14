@@ -62,9 +62,8 @@ public class Roma extends Application {
                     public void handle(ActionEvent event) {
                         File file = getRomaFileChooser().showOpenDialog(stage);
                         if(file != null) {
-                            romaGrid = new Grid();
                             try {
-                                romaGrid.readGridFile(file.getAbsolutePath());
+                                romaGrid = Grid.readGridFile(file.getAbsolutePath());
                             } catch (IOException | MalformedGridException e) {
                                 e.printStackTrace();
                             }

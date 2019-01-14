@@ -19,9 +19,11 @@ public class Grid {
 
     public Grid(){}
 
+    /*
     public Grid(String aFileName) throws IOException, MalformedGridException {
-        this.readGridFile(aFileName);
+        this. = readGridFile(aFileName);
     }
+    */
 
     public Grid(Grid grid){
         gridHeight = grid.getGridHeight();
@@ -251,50 +253,53 @@ public class Grid {
         throw new UnsupportedOperationException("Unexpected cell state: " + cells[y][x].getArrow());
     }
 
-    public void readGridFile(String aFileName) throws IOException, MalformedGridException {
-        file = readAllLines(aFileName);
-        this.gridWidth = calculateGridWidth(file);
-        this.gridHeight = calculateGridHeight(file);
-        initCells();
-        parseAllFields(file);
-        calculateRegions(file);
+    public static Grid readGridFile(String aFileName) throws IOException, MalformedGridException {
+        Grid grid = new Grid();
+        List<String> file = readAllLines(aFileName);
+        grid.file = file;
+        grid.gridWidth = calculateGridWidth(file);
+        grid.gridHeight = calculateGridHeight(file);
+        grid.initCells();
+        parseAllFields(grid, file);
+        calculateRegions(grid, file);
+        return grid;
     }
 
-    private void calculateRegions(List<String> lines) {
-        connectCellsHorizontally(lines);
-        connectCellsVertically(lines);
-        createSingleCellRegions();
+    private static void calculateRegions(Grid grid, List<String> lines) {
+        connectCellsHorizontally(grid, lines);
+        connectCellsVertically(grid, lines);
+        createSingleCellRegions(grid);
     }
 
-    private void connectCellsHorizontally(List<String> lines) {
-        for(int y = 0; y < this.gridHeight; ++y)
-            for (int x = 0; x < this.gridWidth - 1; ++x)
-                connectRegions(cells[y][x], cells[y][x + 1], lines.get(y * 2 + 1).charAt((x + 1) * 2));
+    private static void connectCellsHorizontally(Grid grid, List<String> lines) {
+        for(int y = 0; y < grid.gridHeight; ++y)
+            for (int x = 0; x < grid.gridWidth - 1; ++x)
+                connectRegions(grid, grid.cells[y][x], grid.cells[y][x + 1], lines.get(y * 2 + 1).charAt((x + 1) * 2));
     }
 
-    private void connectCellsVertically(List<String> lines) {
-        for(int x = 0; x < this.getGridWidth(); ++x)
-            for (int y = 0; y < this.getGridHeight() - 1; ++y)
-                connectRegions(cells[y][x], cells[y + 1][x], lines.get((y + 1) * 2).charAt(x * 2 + 1));
+    private static void connectCellsVertically(Grid grid, List<String> lines) {
+        for(int x = 0; x < grid.getGridWidth(); ++x)
+            for (int y = 0; y < grid.getGridHeight() - 1; ++y)
+                connectRegions(grid, grid.cells[y][x], grid.cells[y + 1][x], lines.get((y + 1) * 2).charAt(x * 2 + 1));
     }
 
-    private void createSingleCellRegions() {
-        for(int y = 0; y < this.getGridHeight(); ++y)
-            for(int x = 0; x < this.getGridWidth(); ++x)
-                if(cells[y][x].getRegion() == null){
+    private static void createSingleCellRegions(Grid grid) {
+        for(int y = 0; y < grid.getGridHeight(); ++y)
+            for(int x = 0; x < grid.getGridWidth(); ++x)
+                if(grid.cells[y][x].getRegion() == null){
                     Region newRegion = new Region();
-                    newRegion.addCell(cells[y][x]);
-                    this.regions.add(newRegion);
+                    newRegion.addCell(grid.cells[y][x]);
+                    grid.regions.add(newRegion);
                 }
     }
 
-    private void connectRegions(Cell cellA, Cell cellB, char c) {
+    private static void connectRegions(Grid grid, Cell cellA, Cell cellB, char c) {
         if(c == ' '){
             if(cellA.getRegion() == null && cellB.getRegion() == null){
                 Region newRegion = new Region();
                 newRegion.addCell(cellA);
                 newRegion.addCell(cellB);
-                this.regions.add(newRegion);
+                grid.regions.add(newRegion);
             }else{
                 if(cellA.getRegion() == null)
                     cellB.getRegion().addCell(cellA);
@@ -302,16 +307,16 @@ public class Grid {
                     cellA.getRegion().addCell(cellB);
             }
             if(cellA.getRegion() != null && cellB.getRegion() != null)
-                fuseRegions(cellA.getRegion(), cellB.getRegion());
+                fuseRegions(grid, cellA.getRegion(), cellB.getRegion());
         }
     }
 
-    private void fuseRegions(Region regionA, Region regionB) {
+    private static void fuseRegions(Grid grid, Region regionA, Region regionB) {
         if(regionA != regionB) {
             for (Cell cell : regionB.getCells())
                 regionA.addCell(cell);
             regionB.getCells().clear();
-            this.regions.remove(regionB);
+            grid.regions.remove(regionB);
         }
     }
 
@@ -319,18 +324,18 @@ public class Grid {
         cells = new Cell[this.gridHeight][this.gridWidth];
     }
 
-    private void parseAllFields(List<String> lines) throws MalformedGridException {
+    private static void parseAllFields(Grid grid, List<String> lines) throws MalformedGridException {
         for(int i = 0; i < lines.size()-1; i+=2)
-            parseGridLine(lines.get(i+1), i/2);
+            parseGridLine(grid, lines.get(i+1), i/2);
     }
 
-    private int calculateGridHeight(List<String> lines) throws MalformedGridException{
+    private static int calculateGridHeight(List<String> lines) throws MalformedGridException{
         if((lines.size() % 2) == 0)
             throw new MalformedGridException();
         return (lines.size()-1)/2;
     }
 
-    private List<String> readAllLines(String aFileName) throws IOException {
+    private static List<String> readAllLines(String aFileName) throws IOException {
         ArrayList<String> stringList = new ArrayList<>();
 
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(aFileName), "UTF8"));
@@ -342,18 +347,18 @@ public class Grid {
         return stringList;
     }
 
-    private int calculateGridWidth(List<String> line) throws MalformedGridException {
+    private static int calculateGridWidth(List<String> line) throws MalformedGridException {
         if((line.get(0).length() % 2) == 0)
             throw new MalformedGridException();
         return (line.get(0).length()-1)/2;
     }
 
-    private void parseGridLine(String line, int aHeight) throws MalformedGridException {
+    private static void parseGridLine(Grid grid, String line, int aHeight) throws MalformedGridException {
         for(int i = 1; i < line.length(); i += 2)
-            this.cells[aHeight][(i-1)/2] = parseCell(line.charAt(i));
+            grid.cells[aHeight][(i-1)/2] = parseCell(line.charAt(i));
     }
 
-    private Cell parseCell(char aCharacter) throws MalformedGridException {
+    private static Cell parseCell(char aCharacter) throws MalformedGridException {
         switch (aCharacter) {
             case '↑':
             case 'U':
