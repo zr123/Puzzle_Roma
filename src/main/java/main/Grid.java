@@ -1,9 +1,7 @@
 package main;
 
 import exception.ErroneousGridException;
-import exception.MalformedGridException;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -270,6 +268,10 @@ public class Grid {
 
     public Cell getCell(int y, int x){
         return this.cells[y][x];
+    }
+
+    public Cell[][] getCells(){
+        return cells;
     }
 
     public List<String> getFile(){

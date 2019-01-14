@@ -64,11 +64,11 @@ public class GridReader {
     }
 
     private static void createSingleCellRegions(Grid grid) {
-        for(int y = 0; y < grid.getGridHeight(); ++y)
-            for(int x = 0; x < grid.getGridWidth(); ++x)
-                if(grid.getCell(y, x).getRegion() == null){
+        for(Cell[] row : grid.getCells())
+            for(Cell cell : row)
+                if(cell.getRegion() == null){
                     Region newRegion = new Region();
-                    newRegion.addCell(grid.getCell(y, x));
+                    newRegion.addCell(cell);
                     grid.getRegions().add(newRegion);
                 }
     }
