@@ -52,24 +52,24 @@ public class GridReader {
     }
 
     private static void connectCellsHorizontally(Grid grid, List<String> lines) {
-        for(int y = 0; y < grid.gridHeight; ++y)
-            for (int x = 0; x < grid.gridWidth - 1; ++x)
-                connectRegions(grid, grid.cells[y][x], grid.cells[y][x + 1], lines.get(y * 2 + 1).charAt((x + 1) * 2));
+        for(int y = 0; y < grid.getGridHeight(); ++y)
+            for (int x = 0; x < grid.getGridWidth() - 1; ++x)
+                connectRegions(grid, grid.getCell(y, x), grid.getCell(y, x + 1), lines.get(y * 2 + 1).charAt((x + 1) * 2));
     }
 
     private static void connectCellsVertically(Grid grid, List<String> lines) {
         for(int x = 0; x < grid.getGridWidth(); ++x)
             for (int y = 0; y < grid.getGridHeight() - 1; ++y)
-                connectRegions(grid, grid.cells[y][x], grid.cells[y + 1][x], lines.get((y + 1) * 2).charAt(x * 2 + 1));
+                connectRegions(grid, grid.getCell(y, x), grid.getCell(y + 1, x), lines.get((y + 1) * 2).charAt(x * 2 + 1));
     }
 
     private static void createSingleCellRegions(Grid grid) {
         for(int y = 0; y < grid.getGridHeight(); ++y)
             for(int x = 0; x < grid.getGridWidth(); ++x)
-                if(grid.cells[y][x].getRegion() == null){
+                if(grid.getCell(y, x).getRegion() == null){
                     Region newRegion = new Region();
-                    newRegion.addCell(grid.cells[y][x]);
-                    grid.regions.add(newRegion);
+                    newRegion.addCell(grid.getCell(y, x));
+                    grid.getRegions().add(newRegion);
                 }
     }
 
@@ -79,7 +79,7 @@ public class GridReader {
                 Region newRegion = new Region();
                 newRegion.addCell(cellA);
                 newRegion.addCell(cellB);
-                grid.regions.add(newRegion);
+                grid.getRegions().add(newRegion);
             }else{
                 if(cellA.getRegion() == null)
                     cellB.getRegion().addCell(cellA);
@@ -96,7 +96,7 @@ public class GridReader {
             for (Cell cell : regionB.getCells())
                 regionA.addCell(cell);
             regionB.getCells().clear();
-            grid.regions.remove(regionB);
+            grid.getRegions().remove(regionB);
         }
     }
 
@@ -107,7 +107,7 @@ public class GridReader {
 
     private static void parseGridLine(Grid grid, String line, int aHeight) throws MalformedGridException {
         for(int i = 1; i < line.length(); i += 2)
-            grid.cells[aHeight][(i-1)/2] = parseCell(line.charAt(i));
+            grid.setCell(aHeight, (i-1)/2, parseCell(line.charAt(i)));
     }
 
     private static Cell parseCell(char aCharacter) throws MalformedGridException {

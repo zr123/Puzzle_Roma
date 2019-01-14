@@ -11,11 +11,11 @@ import java.util.Set;
 public class Grid {
     public List<String> file;
     private final int MAX_DEPTH = 5;
-    public int gridWidth = 0;
-    public int gridHeight = 0;
+    private int gridWidth = 0;
+    private int gridHeight = 0;
 
-    public List<Region> regions = new ArrayList<>();
-    public Cell[][] cells; // cell[y][x]
+    private List<Region> regions = new ArrayList<>();
+    private Cell[][] cells; // cell[y][x]
 
     public Grid(){}
 
@@ -274,5 +274,9 @@ public class Grid {
 
     public List<String> getFile(){
         return this.file;
+    }
+
+    public void setCell(int y, int x, Cell aCell) {
+        this.cells[y][x] = aCell;
     }
 }
