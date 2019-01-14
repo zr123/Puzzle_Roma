@@ -16,6 +16,7 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import main.Grid;
+import main.GridReader;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,7 +64,7 @@ public class Roma extends Application {
                         File file = getRomaFileChooser().showOpenDialog(stage);
                         if(file != null) {
                             try {
-                                romaGrid = Grid.readGridFile(file.getAbsolutePath());
+                                romaGrid = GridReader.readGridFile(file.getAbsolutePath());
                             } catch (IOException | MalformedGridException e) {
                                 e.printStackTrace();
                             }
