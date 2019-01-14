@@ -15,8 +15,6 @@ public class Grid {
     private List<Region> regions = new ArrayList<>();
     private Cell[][] cells; // cell[y][x]
 
-    public Grid(){}
-
     public Grid(int width, int height){
         this.gridWidth = width;
         this.gridHeight = height;
@@ -73,7 +71,7 @@ public class Grid {
     private void lockCellsWithOnlyOneOptionIn() throws ErroneousGridException {
         for(int y = 0; y < gridHeight; ++y)
             for(int x = 0; x < gridWidth; ++x)
-                if(checkCellOptions(y, x)){
+                if(cells[y][x].checkCellOptions()){
                     // set Cell and start over.
                     setCellAndUpdateOptions(y, x, getLastRemainingOption(cells[y][x].getOptions()));
                     y = 0;
@@ -112,22 +110,6 @@ public class Grid {
             case CIRCLE:    return;
         }
         throw new UnsupportedOperationException("Unexpected cell state: " + cells[y][x].getArrow());
-        }
-
-    /**
-     * This function checks if a cell is unsolved and has only one option remainging.
-     * @param y y-Coordinate of the cell.
-     * @param x x-Coordinate of the cell.
-     * @return True of the Cell has only one Option remaining. Otherwise false.
-     * @throws ErroneousGridException If there are no options left the current grid is erroneous.
-     */
-    private boolean checkCellOptions(int y, int x) throws ErroneousGridException {
-        if (cells[y][x].getArrow().equals(Arrow.NONE))
-            switch (cells[y][x].getOptions().size()){
-                case 0: throw new ErroneousGridException("Cell y:" + y + " x:" + x + " has no options remaining");
-                case 1: return true;
-            }
-        return false;
     }
 
     private void setCellAndUpdateOptions(int y, int x, Arrow aArrow){
@@ -169,18 +151,18 @@ public class Grid {
 
     private void removeOpposingPointingOptionFromAdjacentCell(int y, int x){
         switch (cells[y][x].getArrow()){
-            case UP:    if(checkBounds(y, x))
-                            cells[y-1][x].removeOption(Arrow.DOWN);
-                        break;
-            case DOWN:  if(checkBounds(y, x))
-                            cells[y+1][x].removeOption(Arrow.UP);
-                        break;
-            case LEFT:  if(checkBounds(y, x))
-                            cells[y][x-1].removeOption(Arrow.RIGHT);
-                        break;
-            case RIGHT: if(checkBounds(y, x))
-                            cells[y][x+1].removeOption(Arrow.LEFT);
-                        break;
+            case UP:
+                cells[y-1][x].removeOption(Arrow.DOWN);
+                break;
+            case DOWN:
+                cells[y+1][x].removeOption(Arrow.UP);
+                break;
+            case LEFT:
+                cells[y][x-1].removeOption(Arrow.RIGHT);
+                break;
+            case RIGHT:
+                cells[y][x+1].removeOption(Arrow.LEFT);
+                break;
         }
     }
 

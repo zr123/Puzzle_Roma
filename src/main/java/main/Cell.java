@@ -1,5 +1,7 @@
 package main;
 
+import exception.ErroneousGridException;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,6 +31,20 @@ public class Cell {
         arrow = cell.arrow;
         immutable = cell.immutable;
         options.addAll(cell.options);
+    }
+
+    /**
+     * This function checks if a cell is unsolved and has only one option remainging.
+     * @return True of the Cell has only one Option remaining. Otherwise false.
+     * @throws ErroneousGridException If there are no options left the current grid is erroneous.
+     */
+    public boolean checkCellOptions() throws ErroneousGridException {
+        if (arrow.equals(Arrow.NONE))
+            switch (options.size()){
+                case 0: throw new ErroneousGridException("");
+                case 1: return true;
+            }
+        return false;
     }
 
     public Set<Arrow> getOptions(){
