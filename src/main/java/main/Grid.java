@@ -15,6 +15,8 @@ public class Grid {
     private List<Region> regions = new ArrayList<>();
     private Cell[][] cells; // cell[y][x]
 
+    public Grid(){}
+
     public Grid(int width, int height){
         this.gridWidth = width;
         this.gridHeight = height;
@@ -23,12 +25,14 @@ public class Grid {
     public Grid(Grid grid){
         gridHeight = grid.getGridHeight();
         gridWidth = grid.getGridWidth();
-        initCells();
-        // add regions
-        for (Region region : grid.getRegions()) {
+        for (Region region : grid.getRegions())
             regions.add(new Region(region));
-        }
-        // add cells and set regions
+        initCells();
+        deepCopyCells(grid);
+
+    }
+
+    private void deepCopyCells(Grid grid){
         for(int y = 0; y < gridHeight; ++y)
             for (int x = 0; x < gridWidth; ++x){
                 cells[y][x] = new Cell(grid.getCell(y, x));
